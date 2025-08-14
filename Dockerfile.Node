@@ -1,0 +1,19 @@
+# Possiveis opções de versões
+ARG VERSION
+ARG ARGUMENTS_INSTALL || --no-package-lock --loglevel error --legacy-peer-deps
+
+# Etapa para instalar as dependências
+FROM node:VERSION AS deps
+
+# Otimizando a camada de install usando o cache do docker
+# caso o package.json não tenha sido alterado usar o cached
+COPY package*.json .
+RUN npm install ${ARGUMENTS_INSTALL}
+
+FROM node:VERSION AS build
+
+WORKDIR app
+COPY . .
+EXPOSE 8080
+
+CMD [ "npm", "run",  "start" ]
